@@ -33,12 +33,16 @@ export const ContactSection = () => {
               </p>
 
               <div className="space-y-3">
+                <a href="tel:+916379863518" className="flex items-center space-x-3 text-xs font-mono transition-colors hover:opacity-80" style={{ color: 'var(--text-secondary)' }}>
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--accent-cyan)' }} />
+                  <span>+91 6379863518</span>
+                </a>
                 <a href="mailto:raks061128@gmail.com" className="flex items-center space-x-3 text-xs font-mono transition-colors hover:opacity-80" style={{ color: 'var(--text-secondary)' }}>
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--accent-green)' }} />
                   <span>raks061128@gmail.com</span>
                 </a>
                 <a href="https://linkedin.com/in/rakshana-jayagopal" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-xs font-mono transition-colors hover:opacity-80" style={{ color: 'var(--text-secondary)' }}>
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--accent-cyan)' }} />
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--accent-purple)' }} />
                   <span>linkedin.com/in/rakshana-jayagopal</span>
                 </a>
                 <a href="https://github.com/rakshana-123" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-xs font-mono transition-colors hover:opacity-80" style={{ color: 'var(--text-secondary)' }}>

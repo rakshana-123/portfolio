@@ -168,7 +168,7 @@ export const AboutSection = () => {
                       : { backgroundColor: 'var(--bg-tertiary)', border: `1px solid color-mix(in srgb, var(--accent-green) 20%, transparent)` }
                     }>
                     <img
-                      src="/profile.jpeg"
+                      src="/portfolio/profile.jpeg"
                       alt="Rakshana Jayagopal"
                       className="w-full h-full object-cover object-top rounded-2xl"
                       style={{ filter: isLight ? 'brightness(1.02) contrast(1.02)' : 'brightness(0.95) contrast(1.05)' }}

@@ -1,297 +1,234 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
-import watermarkImg from '../assets/watermark.png';
+import { useTheme } from '../context/ThemeContext';
+import { ThemeToggle } from './ThemeToggle';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.16,
-      delayChildren: 0.2,
-    },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.16, delayChildren: 0.2 } },
 };
 
 const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 18, filter: 'blur(6px)' },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-    transition: {
-      duration: 1.1,
-      ease: [0.16, 1, 0.3, 1],
-    },
-  },
+  visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } },
 };
+
+const typingTexts = [
+  { text: "Welcome to my portfolio", style: "primary" },
+  { text: "Aspiring Full Stack Developer", style: "secondary" },
+  { text: "Fresh Graduate in Computer Science", style: "tertiary" },
+  { text: "AI & Machine Learning Enthusiast", style: "primary" },
+  { text: "Ready to build impactful solutions", style: "secondary" },
+];
 
 const navItems = [
   { name: 'ABOUT', href: '#about' },
-  { name: 'PROJECTS', href: '#work' },
-  { name: 'SKILLS', href: '#skills' },
   { name: 'EXPERIENCE', href: '#experience' },
+  { name: 'SKILLS', href: '#skills' },
+  { name: 'PROJECTS', href: '#projects' },
   { name: 'CONTACT', href: '#contact' },
 ];
 
-export const HeroSection: React.FC = () => {
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-  const [isHovered, setIsHovered] = useState(false);
+const TypingAnimation = () => {
+  const [textIndex, setTextIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setCursorPos({ x: e.clientX, y: e.clientY });
-    };
+    const currentText = typingTexts[textIndex].text;
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (!isDeleting && charIndex < currentText.length) {
+      timeout = setTimeout(() => setCharIndex(charIndex + 1), 80);
+    } else if (!isDeleting && charIndex === currentText.length) {
+      timeout = setTimeout(() => setIsDeleting(true), 2000);
+    } else if (isDeleting && charIndex > 0) {
+      timeout = setTimeout(() => setCharIndex(charIndex - 1), 40);
+    } else if (isDeleting && charIndex === 0) {
+      setIsDeleting(false);
+      setTextIndex((textIndex + 1) % typingTexts.length);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [charIndex, isDeleting, textIndex]);
+
+  const currentStyle = typingTexts[textIndex].style;
+
+  const getStyleClass = () => {
+    switch (currentStyle) {
+      case 'primary':
+        return 'animate-glitch';
+      case 'secondary':
+        return 'animate-neon-pulse';
+      case 'tertiary':
+        return 'animate-cyber-flicker';
+      default:
+        return '';
+    }
+  };
+
+  const getGlowColor = () => {
+    switch (currentStyle) {
+      case 'primary': return 'var(--accent-green)';
+      case 'secondary': return 'var(--accent-cyan)';
+      case 'tertiary': return 'var(--accent-purple)';
+      default: return 'var(--accent-green)';
+    }
+  };
+
+  return (
+    <div className="flex flex-col space-y-3">
+      <div className="relative whitespace-nowrap">
+        <span className={`text-xl sm:text-2xl md:text-3xl font-mono tracking-wide ${getStyleClass()}`}
+          style={{
+            color: getGlowColor(),
+            textShadow: `0 0 10px ${getGlowColor()}, 0 0 20px ${getGlowColor()}`,
+          }}>
+          {typingTexts[textIndex].text.slice(0, charIndex)}
+        </span>
+        <span className="inline-block w-[3px] h-7 ml-1 animate-blink" style={{ backgroundColor: getGlowColor(), boxShadow: `0 0 8px ${getGlowColor()}` }} />
+      </div>
+      <div className="flex space-x-1">
+        {typingTexts.map((_, i) => (
+          <div key={i} className="h-[2px] flex-1 rounded-full transition-all duration-300"
+            style={{
+              backgroundColor: i === textIndex ? getGlowColor() : 'var(--text-secondary)',
+              opacity: i === textIndex ? 1 : 0.3,
+              boxShadow: i === textIndex ? `0 0 6px ${getGlowColor()}` : 'none',
+            }} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const HeroSection = () => {
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const [isHovered, setIsHovered] = useState(false);
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY });
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   return (
-    <section className="relative w-screen h-screen overflow-hidden bg-black text-[#E8DFD8] font-sans selection:bg-[#cbb59d] selection:text-black cursor-none">
-      {/* ================= 1. MINIMAL CUSTOM CURSOR ================= */}
+    <section className="relative w-screen h-screen overflow-hidden font-heading cursor-none" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      {/* Custom Cursor */}
       {cursorPos.x >= 0 && (
         <motion.div
-          className="fixed top-0 left-0 pointer-events-none z-50 rounded-full border border-[#D4AF37]/40 flex items-center justify-center backdrop-blur-[1px]"
+          className="fixed top-0 left-0 pointer-events-none z-50 rounded-full flex items-center justify-center"
           animate={{
             x: cursorPos.x - (isHovered ? 24 : 5),
             y: cursorPos.y - (isHovered ? 24 : 5),
             width: isHovered ? 48 : 10,
             height: isHovered ? 48 : 10,
-            backgroundColor: isHovered ? 'rgba(212, 175, 55, 0.1)' : 'rgba(235, 215, 195, 0.95)',
+            backgroundColor: 'var(--accent-green)',
+            opacity: isHovered ? 0.15 : 0.8,
+            boxShadow: isHovered ? `0 0 30px var(--glow-green), 0 0 60px var(--glow-green)` : `0 0 10px var(--glow-green)`,
           }}
           transition={{ type: 'spring', damping: 30, stiffness: 350, mass: 0.5 }}
         />
       )}
 
-      {/* ================= 2. FIXED VIDEO LAYER ================= */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-black flex items-center justify-end">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="h-screen w-auto max-w-none object-contain origin-right scale-95 md:scale-[0.98] lg:scale-100"
-        >
-          <source src="/videos/hero.mp4" type="video/mp4" />
-        </video>
-
-        {/* Seamless Soft Left Edge Blend */}
-        <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none" />
-
-        {/* ================= 3. ANIMATED WATERMARK EMBLEM ================= */}
-        <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-12 pointer-events-none flex items-center justify-center z-10">
-          <div className="relative flex items-center justify-center">
-            <div className="absolute w-36 h-36 bg-black/85 rounded-full blur-xl" />
-
-            <motion.div
-              animate={{
-                y: [-3, 3, -3],
-                scale: [1, 1.03, 1],
-              }}
-              transition={{
-                duration: 4.5,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-              className="relative flex items-center justify-center"
-            >
-              <img
-                src={watermarkImg}
-                alt="Insignia"
-                className="w-28 h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_0_15px_rgba(212,175,55,0.25)]"
-              />
-            </motion.div>
-          </div>
-        </div>
+      {/* Background Orbs */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className={`absolute top-1/4 left-1/4 w-[30rem] h-[30rem] rounded-full blur-[150px] ${theme === 'light' ? 'orb-green' : ''}`} style={{ backgroundColor: theme === 'dark' ? 'var(--accent-green)' : 'transparent', opacity: theme === 'dark' ? 0.05 : 1 }} />
+        <div className={`absolute bottom-1/4 right-1/4 w-[25rem] h-[25rem] rounded-full blur-[150px] ${theme === 'light' ? 'orb-cyan' : ''}`} style={{ backgroundColor: theme === 'dark' ? 'var(--accent-cyan)' : 'transparent', opacity: theme === 'dark' ? 0.05 : 1 }} />
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20rem] h-[20rem] rounded-full blur-[150px] ${theme === 'light' ? 'orb-purple' : ''}`} style={{ backgroundColor: theme === 'dark' ? 'var(--accent-purple)' : 'transparent', opacity: theme === 'dark' ? 0.03 : 1 }} />
       </div>
 
-      {/* ================= 4. CONTENT LAYER ================= */}
+      {/* Content */}
       <div className="relative z-10 flex flex-col justify-between h-full w-full px-6 sm:px-12 lg:px-16 pt-6 pb-8 pointer-events-none">
-        
-        {/* Navigation Bar */}
+        {/* Navigation */}
         <header className="relative flex items-center justify-between w-full pointer-events-auto">
-          <a
-            href="#"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className="text-xs sm:text-sm font-semibold tracking-[0.35em] uppercase text-[#EAD8C7] hover:opacity-75 transition-opacity"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
-            LOHITHA.
+          <a href="#" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
+            className="text-sm font-bold tracking-[0.3em] uppercase transition-colors duration-300"
+            style={{ fontFamily: "'Orbitron', sans-serif", color: 'var(--accent-green)' }}>
+            PORTFOLIO<span style={{ color: 'var(--accent-cyan)' }}>.</span>
           </a>
 
-          {/* Navigation Links */}
-          <nav
-            className="hidden md:flex items-center space-x-8 lg:space-x-10 text-[11px] tracking-[0.28em] font-light uppercase text-[#C4B5A5] absolute left-1/2 -translate-x-1/2"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
+          <nav className="hidden md:flex items-center space-x-8 text-[11px] tracking-[0.25em] font-mono uppercase absolute left-1/2 -translate-x-1/2" style={{ color: 'var(--text-secondary)' }}>
             {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                className="relative group py-1 transition-colors duration-300 hover:text-[#FFF5EB]"
-              >
+              <a key={item.name} href={item.href} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
+                className="relative group py-1 transition-colors duration-300 hover:text-[var(--text-primary)]">
                 {item.name}
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#D4AF37]/50 transition-all duration-300 group-hover:w-full" />
+                <span className="absolute bottom-0 left-0 w-0 h-[1px] transition-all duration-300 group-hover:w-full" style={{ backgroundColor: 'var(--text-primary)', boxShadow: `0 0 8px var(--text-primary)` }} />
               </a>
             ))}
           </nav>
 
-          {/* Right Action */}
-          <a
-            href="#contact"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className="group flex items-center space-x-2 text-[11px] tracking-[0.24em] font-light uppercase py-2 px-4 border border-[#8C6D4F]/50 hover:border-[#D4AF37] text-[#EAD8C7] transition-all duration-300 backdrop-blur-sm ml-auto md:ml-0"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
-            <span>LET&apos;S TALK</span>
-            <span className="transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-xs">
-              ↗
-            </span>
-          </a>
+          <div className="flex items-center gap-3 ml-auto md:ml-0">
+            <ThemeToggle />
+            <a href="#contact" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
+              className="group hidden sm:flex items-center space-x-2 text-[11px] tracking-[0.2em] font-mono uppercase py-2 px-4 border transition-all duration-300 hover:bg-[var(--glow-green)]"
+              style={{ borderColor: `color-mix(in srgb, var(--text-primary) 40%, transparent)`, color: 'var(--text-primary)' }}>
+              <span>LET'S CONNECT</span>
+              <span className="transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-xs">↗</span>
+            </a>
+          </div>
         </header>
 
-        {/* Main Hero Row */}
+        {/* Hero Content */}
         <div className="relative flex flex-col md:flex-row items-center justify-between w-full pt-4 pb-2 my-auto">
-          
-          {/* LEFT: Balanced Headline & Actions */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="max-w-sm sm:max-w-md md:max-w-lg lg:max-w-[37rem] xl:max-w-[40rem] pointer-events-auto z-20"
-          >
-            {/* Massive Condensed Headline */}
-            <motion.div variants={fadeUpVariants} className="relative mb-3.5 select-none">
-              <h1
-                className="text-6xl sm:text-7xl md:text-8xl lg:text-[7.2rem] xl:text-[7.8rem] tracking-tight uppercase leading-[0.83]"
-                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-              >
-                {/* Line 1: I BUILD */}
-                <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#FFFFFF] via-[#D5CBC0] to-[#605448] drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)]">
-                  I BUILD
-                </span>
+          <motion.div variants={containerVariants} initial="hidden" animate="visible"
+            className="max-w-sm sm:max-w-md md:max-w-lg lg:max-w-[42rem] pointer-events-auto z-20">
 
-                {/* Line 2: DIGITAL */}
-                <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#F7E7C4] via-[#C99E5D] to-[#543B1A] drop-shadow-[0_8px_25px_rgba(201,158,93,0.35)]">
-                  DIGITAL
-                </span>
-
-                {/* Line 3: EXPERIENCES */}
-                <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#DFBE8A] via-[#9B7640] to-[#342410] drop-shadow-[0_10px_30px_rgba(155,118,64,0.4)]">
-                  EXPERIENCES
-                </span>
+            <motion.div variants={fadeUpVariants} className="relative mb-4 select-none">
+              <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] tracking-tight uppercase leading-[0.85] font-bold">
+                <span className="block" style={{ color: 'var(--text-primary)', textShadow: `0 0 20px var(--glow-green)` }}>RAKSHANA</span>
+                <span className="block" style={{ color: 'var(--accent-green)', textShadow: `0 0 20px var(--glow-green)` }}>JAYAGOPAL</span>
               </h1>
             </motion.div>
 
-            {/* Subtitle Technologies */}
-            <motion.div variants={fadeUpVariants} className="mb-4">
-              <p
-                className="text-[10px] sm:text-[11px] md:text-xs font-normal tracking-[0.28em] uppercase text-[#C4B29E]"
-                style={{ fontFamily: "'Montserrat', sans-serif" }}
-              >
-                FULL STACK DEVELOPER <span className="text-[#8C6D4F] mx-1">•</span> UI/UX DESIGNER <span className="text-[#8C6D4F] mx-1">•</span> DATA SCIENCE
+            <motion.div variants={fadeUpVariants} className="mb-5">
+              <p className="text-[11px] sm:text-xs font-mono font-normal tracking-[0.25em] uppercase" style={{ color: 'var(--text-secondary)' }}>
+                <span style={{ color: 'var(--text-primary)' }}>FULL STACK DEVELOPER</span>
+                <span className="mx-2" style={{ color: 'var(--accent-green)' }}>◆</span>
+                <span style={{ color: 'var(--accent-cyan)' }}>AI ENGINEER</span>
+                <span className="mx-2" style={{ color: 'var(--accent-green)' }}>◆</span>
+                <span style={{ color: 'var(--text-muted)' }}>SALEM, INDIA</span>
               </p>
             </motion.div>
 
-            {/* 3-Line Description */}
-            <motion.div
-              variants={fadeUpVariants}
-              className="text-xs sm:text-sm md:text-[13.5px] font-light text-[#A8988B] leading-[1.8] tracking-wide max-w-lg mb-6 space-y-1"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-              <p>
-                I turn bold ideas into seamless digital experiences.
-                <br />
-                Where frontend meets powerful backend, and code transforms vision into impact.
-              </p>
+            <motion.div variants={fadeUpVariants} className="text-xs sm:text-sm md:text-[14px] font-light leading-[1.85] tracking-wide max-w-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
+              <p>Building scalable applications, intelligent workflows, and practical AI-driven solutions.<br />Where full-stack engineering meets AI innovation.</p>
             </motion.div>
 
-            {/* CTA Buttons */}
-            <motion.div
-              variants={fadeUpVariants}
-              className="flex flex-row items-center gap-4 sm:gap-6"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-              {/* Explore My Work CTA */}
-              <motion.a
-                href="#work"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                whileHover={{ scale: 1.02 }}
-                className="relative inline-flex items-center space-x-3 px-6 sm:px-7 py-3.5 border border-[#8C6D4F] bg-[#120F0C]/80 hover:border-[#D4AF37] text-[#EAD8C7] hover:text-[#FFF5EB] text-[11px] font-medium tracking-[0.24em] uppercase transition-all duration-300 shadow-[0_0_25px_rgba(212,175,55,0.18)]"
-              >
-                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#E8D7C5]/40 to-transparent pointer-events-none" />
-                <span>EXPLORE MY WORK</span>
-                <span className="transform transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-xs">
-                  ↗
-                </span>
+            <motion.div variants={fadeUpVariants} className="flex flex-row items-center gap-4 sm:gap-6">
+              <motion.a href="#projects" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} whileHover={{ scale: 1.02 }}
+                className={theme === 'light' ? 'glass-btn relative inline-flex items-center space-x-3 px-6 sm:px-7 py-3.5 text-[11px] font-mono font-medium tracking-[0.2em] uppercase' : 'relative inline-flex items-center space-x-3 px-6 sm:px-7 py-3.5 border text-[11px] font-mono font-medium tracking-[0.2em] uppercase transition-all duration-300'}
+                style={theme === 'dark' ? { borderColor: 'var(--text-primary)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-secondary)' } : {}}>
+                {theme === 'dark' && <div className="absolute top-0 left-0 w-full h-[1px] pointer-events-none" style={{ backgroundImage: `linear-gradient(to right, transparent, var(--text-primary), transparent)`, opacity: 0.3 }} />}
+                <span>VIEW PROJECTS</span><span className="text-xs">↗</span>
               </motion.a>
 
-              {/* Download Resume Button */}
-              <motion.a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                whileHover={{ scale: 1.02 }}
-                className="relative inline-flex items-center space-x-2 px-6 sm:px-7 py-3.5 border border-[#8C6D4F]/40 hover:border-[#8C6D4F] text-[#BFA895] hover:text-[#EAD8C7] text-[11px] font-medium tracking-[0.24em] uppercase transition-all duration-300"
-              >
-                <span>DOWNLOAD RESUME</span>
-                <span className="transform transition-transform duration-300 group-hover:translate-y-0.5 text-xs">
-                  ↓
-                </span>
+              <motion.a href="#contact" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} whileHover={{ scale: 1.02 }}
+                className="inline-flex items-center space-x-2 px-6 sm:px-7 py-3.5 border text-[11px] font-mono font-medium tracking-[0.2em] uppercase transition-all duration-300"
+                style={{ borderColor: `color-mix(in srgb, var(--text-secondary) 40%, transparent)`, color: 'var(--text-secondary)' }}>
+                <span>CONTACT</span><span className="text-xs">↓</span>
               </motion.a>
             </motion.div>
           </motion.div>
 
-          {/* RIGHT: Floating Quote & Signature Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.8, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="hidden lg:flex flex-col items-start pointer-events-auto pr-24 xl:pr-36 mr-4 z-20 select-none"
-          >
-            {/* 1. Quote Mark */}
-            <span className="text-xl text-[#C99E5D] leading-none font-serif mb-2">
-              “
-            </span>
-
-            {/* 2. Compact Two-Line Statement */}
-            <div 
-              className="text-[9.5px] font-medium tracking-[0.24em] uppercase text-[#E0D3C5] space-y-1 mb-3"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-              <p>CODE IS MY CRAFT.</p>
-              <p>IMPACT IS MY GOAL.</p>
-            </div>
-
-            {/* 3. Gold Accent Line */}
-            <div className="w-28 h-[1px] bg-gradient-to-r from-[#D4AF37] via-[#E8D7C5]/70 to-transparent shadow-[0_0_8px_rgba(212,175,55,0.4)] mb-2" />
-
-            {/* 4. Fine Monoline Calligraphy Signature */}
-            <div 
-              className="text-[2.2rem] text-[#D8AB64] font-normal leading-none -ml-0.5"
-              style={{ 
-                fontFamily: "'Herr Von Muellerhoff', 'Allura', cursive",
-                letterSpacing: '0.04em',
-              }}
-            >
-              Lohitha
+          {/* Typing Animation */}
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="hidden lg:flex flex-col items-start pointer-events-auto pr-16 xl:pr-28 ml-8 z-20 select-none">
+            <div className={theme === 'light' ? 'glass p-6 space-y-4' : 'p-6 space-y-4'} style={theme === 'dark' ? { border: `1px solid color-mix(in srgb, var(--accent-green) 20%, transparent)`, backgroundColor: 'var(--bg-secondary)' } : {}}>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 rounded-full animate-pulse-glow" style={{ backgroundColor: 'var(--accent-green)' }} />
+                <span className="text-[10px] font-mono tracking-[0.2em] uppercase" style={{ color: 'var(--accent-green)' }}>PORTFOLIO v2.0</span>
+              </div>
+              <div className="w-full h-[1px]" style={{ backgroundImage: `linear-gradient(to right, var(--accent-green), var(--accent-cyan), transparent)`, opacity: 0.5 }} />
+              <TypingAnimation />
             </div>
           </motion.div>
         </div>
-
-        {/* Bottom Spacer */}
         <div className="h-2" />
       </div>
+      <div className="absolute inset-0 pointer-events-none scan-line" />
     </section>
   );
 };
-
-export default HeroSection;

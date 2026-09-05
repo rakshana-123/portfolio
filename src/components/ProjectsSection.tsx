@@ -1,290 +1,114 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 import ScrollStack, { ScrollStackItem } from './ScrollStack';
 
-interface Project {
-  number: string;
-  title: string;
-  category: string;
-  description: string;
-  githubUrl: string;
-  tech: string[];
-  metrics: { label: string; value: string }[];
-}
+interface Project { number: string; title: string; category: string; description: string; githubUrl: string; tech: string[]; metrics: { label: string; value: string }[]; }
 
 const projects: Project[] = [
-  {
-    number: '01',
-    title: 'PolicyGuard AI',
-    category: 'AI / LEGAL-TECH PLATFORM',
-    description:
-      'AI-powered platform engineered for automated privacy policy analysis and legal contract auditing across web, desktop, and mobile. Implements NLP extraction, real-time risk alert detection, and generative risk score intelligence.',
-    githubUrl: 'https://github.com/lohithadamisetti123',
-    tech: [
-      'React.js',
-      'React Native',
-      'Electron.js',
-      'Node.js',
-      'Express.js',
-      'MongoDB Atlas',
-      'OpenAI API',
-      'Prompt Eng',
-      'NLP',
-      'Docker',
-      'JWT',
-    ],
-    metrics: [
-      { label: 'PLATFORMS', value: 'Web, Mobile, Desktop' },
-      { label: 'ENGINE', value: 'OpenAI NLP / GPT' },
-      { label: 'PIPELINE', value: 'Automated Scoring' },
-    ],
-  },
-  {
-    number: '02',
-    title: 'Software Release Risk Heatmap',
-    category: 'MACHINE LEARNING / DEV PLATFORM',
-    description:
-      'Full-stack predictive release management platform utilizing Machine Learning. Implements a trained Random Forest classifier to categorize release stability from Low to Critical risk, rendered over a live interactive team heatmap.',
-    githubUrl: 'https://github.com/lohithadamisetti123',
-    tech: [
-      'React.js',
-      'TypeScript',
-      'Python',
-      'FastAPI',
-      'scikit-learn',
-      'PostgreSQL',
-      'Tailwind CSS',
-      'REST APIs',
-      'JWT',
-    ],
-    metrics: [
-      { label: 'MODEL', value: 'Random Forest' },
-      { label: 'ACCURACY', value: 'High Precision' },
-      { label: 'DASHBOARD', value: 'Live Risk Heatmap' },
-    ],
-  },
-  {
-    number: '03',
-    title: 'Multi-Tenant SaaS Platform',
-    category: 'CLOUD / DISTRIBUTED SYSTEM',
-    description:
-      'Enterprise-grade multi-tenant platform built for unified management of teams, projects, and execution lifecycles. Architected with strict tenant data isolation, granular Role-Based Access Control (RBAC), and containerized deployments.',
-    githubUrl: 'https://github.com/lohithadamisetti123',
-    tech: [
-      'Node.js',
-      'Express.js',
-      'PostgreSQL',
-      'React',
-      'Docker',
-      'JWT',
-      'RBAC',
-      'REST APIs',
-    ],
-    metrics: [
-      { label: 'ARCHITECTURE', value: 'Multi-Tenant' },
-      { label: 'SECURITY', value: 'RBAC Isolation' },
-      { label: 'CONTAINERS', value: 'Docker Compose' },
-    ],
-  },
-  {
-    number: '04',
-    title: 'Payment Gateway with Hosted Checkout',
-    category: 'FINTECH / PAYMENT SYSTEMS',
-    description:
-      'End-to-end hosted payment gateway infrastructure supporting seamless merchant order generation, multi-currency processing, and secure consumer checkout via UPI and Cards with webhook transaction verification.',
-    githubUrl: 'https://github.com/lohithadamisetti123',
-    tech: [
-      'Node.js',
-      'Spring Boot',
-      'PostgreSQL',
-      'React',
-      'Docker',
-      'REST APIs',
-      'UPI / Card Integrations',
-    ],
-    metrics: [
-      { label: 'PROTOCOLS', value: 'UPI & Cards' },
-      { label: 'BACKEND', value: 'Spring Boot + Node' },
-      { label: 'DATABASE', value: 'ACID PostgreSQL' },
-    ],
-  },
+  { number: '01', title: 'AI Memory Assistant', category: 'AI / PERSONALIZATION PLATFORM', description: 'Captures, organizes, and manages user memories and academic/professional workflows. Automates summaries, reminders, study plans, meeting minutes, flashcards, quizzes, and daily briefings via multimodal RAG, OCR, and NLP processing.', githubUrl: 'https://github.com/rakshana-123', tech: ['Next.js', 'FastAPI', 'MongoDB Atlas', 'RAG', 'NLP', 'OCR', 'AI/ML'], metrics: [{ label: 'MODE', value: 'Multimodal Processing' }, { label: 'ENGINE', value: 'RAG + NLP + OCR' }, { label: 'OUTPUT', value: 'Automated Workflows' }] },
+  { number: '02', title: 'RAG Document Intelligence', category: 'AI / DOCUMENT PROCESSING', description: 'Document processing and information retrieval system with context-aware LLM responses. Implements text extraction, recursive chunking, embedding generation, vector storage, and semantic retrieval for relevant context chunks.', githubUrl: 'https://github.com/rakshana-123', tech: ['Python', 'Streamlit', 'LangChain', 'ChromaDB', 'Groq', 'Llama 3.1'], metrics: [{ label: 'FRAMEWORK', value: 'LangChain + Groq' }, { label: 'VECTOR DB', value: 'ChromaDB' }, { label: 'MODEL', value: 'Llama 3.1' }] },
+  { number: '03', title: 'Edgyy Web Platform', category: 'WEB DEV / SAAS', description: 'Live web application with AI-powered features, built during internship at Sona Incubation Foundation. Engineered modular frontend/backend components, speeding up feature deployment through clean, maintainable code.', githubUrl: 'https://github.com/rakshana-123', tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'REST APIs'], metrics: [{ label: 'STATUS', value: 'Live in Production' }, { label: 'FEATURES', value: 'AI-Powered' }, { label: 'STACK', value: 'MERN Full Stack' }] },
+  { number: '04', title: 'IJRN Research Platform', category: 'EDTECH / PUBLISHING SYSTEM', description: 'SaaS-based research and academic publishing platform. Developed as Intern, implementing full-stack features and improving performance, usability, and scalability for the International Journal of Research Nexus.', githubUrl: 'https://github.com/rakshana-123', tech: ['Next.js', 'Node.js', 'PostgreSQL', 'REST APIs', 'SaaS'], metrics: [{ label: 'TYPE', value: 'SaaS Platform' }, { label: 'DOMAIN', value: 'Academic Publishing' }, { label: 'ROLE', value: 'Intern' }] },
 ];
 
-export const ProjectsSection: React.FC = () => {
+export const ProjectsSection = () => {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
+
+  const neo = {
+    bg: '#E8ECF4',
+    light: '#FFFFFF',
+    dark: '#C5CAD6',
+    raised: `8px 8px 16px #C5CAD6, -8px -8px 16px #FFFFFF`,
+    raisedHover: `10px 10px 20px #BFC4D0, -10px -10px 20px #FFFFFF`,
+    inset: `inset 4px 4px 8px #C5CAD6, inset -4px -4px 8px #FFFFFF`,
+    flat: `6px 6px 12px #C5CAD6, -6px -6px 12px #FFFFFF`,
+  };
+
   return (
-    <section
-      id="work"
-      className="relative w-full bg-black text-[#E8DFD8] font-sans selection:bg-[#cbb59d] selection:text-black pt-20 pb-32 px-6 sm:px-12 lg:px-20"
-    >
-      {/* Studio Ambient Glows */}
-      <div className="absolute top-1/4 left-1/3 w-[36rem] h-[36rem] bg-[#D4AF37]/5 rounded-full blur-[180px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-[#8C6D4F]/5 rounded-full blur-[170px] pointer-events-none" />
+    <section id="projects" className="relative w-full font-heading pt-20 pb-32 px-6 sm:px-12 lg:px-20" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <div className={`absolute top-1/4 left-1/3 w-[36rem] h-[36rem] rounded-full blur-[180px] pointer-events-none ${isLight ? 'orb-green' : ''}`} style={{ backgroundColor: isLight ? 'transparent' : 'var(--accent-green)', opacity: isLight ? 1 : 0.04 }} />
+      <div className={`absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] rounded-full blur-[180px] pointer-events-none ${isLight ? 'orb-cyan' : ''}`} style={{ backgroundColor: isLight ? 'transparent' : 'var(--accent-cyan)', opacity: isLight ? 1 : 0.04 }} />
 
       <div className="max-w-7xl mx-auto w-full relative z-10">
-        
-        {/* Eyebrow Header */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="flex items-center space-x-4 mb-5"
-        >
-          <span
-            className="text-[11px] font-medium tracking-[0.35em] uppercase text-[#D4AF37]"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
-            02 / FEATURED WORK
-          </span>
-          <div className="w-20 h-[1px] bg-gradient-to-r from-[#D4AF37]/80 via-[#8C6D4F]/40 to-transparent" />
+        <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="flex items-center space-x-4 mb-5">
+          <span className="text-[11px] font-mono font-medium tracking-[0.35em] uppercase" style={{ color: 'var(--accent-green)' }}>04 / FEATURED WORK</span>
+          <div className="w-20 h-[1px]" style={{ backgroundImage: `linear-gradient(to right, var(--accent-green), var(--accent-cyan), transparent)`, opacity: 0.8 }} />
         </motion.div>
 
-        {/* Section Headline */}
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-16"
-        >
-          <h2
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] tracking-tight uppercase leading-[0.85] select-none"
-            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-          >
-            <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#FFFFFF] via-[#D5CBC0] to-[#605448] drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
-              SELECTED WORKS.
-            </span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-b from-[#F7E7C4] via-[#C99E5D] to-[#543B1A] drop-shadow-[0_8px_25px_rgba(201,158,93,0.35)]">
-              ENGINEERED VALUE.
-            </span>
+        <motion.div initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9 }} className="flex flex-col md:flex-row md:items-end justify-between mb-16">
+          <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] tracking-tight uppercase leading-[0.85] select-none font-bold">
+            <span className="block" style={{ color: 'var(--accent-green)' }}>SELECTED WORKS.</span>
+            <span className="block" style={{ color: 'var(--accent-cyan)' }}>ENGINEERED IMPACT.</span>
           </h2>
-
-          <p
-            className="text-xs sm:text-sm font-light text-[#A8988B] max-w-sm mt-4 md:mt-0 leading-relaxed"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
-            Scroll down to unfold the system architecture cards. Each platform was built to solve complex operational challenges.
-          </p>
+          <p className="text-xs sm:text-sm font-light max-w-sm mt-4 md:mt-0 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>Scroll to explore each project. Every system was built to solve complex problems with intelligent engineering.</p>
         </motion.div>
 
-        {/* React Bits Stacking Deck */}
-        {/* React Bits Stacking Deck */}
-<ScrollStack
-  itemDistance={20}
-  itemScale={0.035}
-  itemStackDistance={28}
-  stackPosition="15%"
-  scaleEndPosition="6%"
-  baseScale={0.88}
-  useWindowScroll={true}
->
+        <ScrollStack itemDistance={20} itemScale={0.035} itemStackDistance={28} stackPosition="15%" scaleEndPosition="6%" baseScale={0.88} useWindowScroll={true}>
           {projects.map((project) => (
             <ScrollStackItem key={project.title}>
-              <div className="relative w-full rounded-2xl border border-[#8C6D4F]/50 bg-[#0E0C0A] p-8 sm:p-12 shadow-[0_25px_70px_rgba(0,0,0,0.98)] group overflow-hidden transition-colors duration-500 hover:border-[#D4AF37]">
-                
-                {/* Top Gold Border Light Flare */}
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/80 to-transparent" />
+              <div className={`relative w-full p-8 sm:p-12 group overflow-hidden transition-colors duration-500 rounded-2xl`}
+                style={isLight
+                  ? { background: neo.bg, boxShadow: neo.raised }
+                  : { backgroundColor: 'var(--bg-secondary)', border: '1px solid color-mix(in srgb, var(--accent-green) 30%, transparent)' }
+                }>
+                {!isLight && <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ backgroundImage: `linear-gradient(to right, transparent, color-mix(in srgb, var(--accent-green) 60%, transparent), transparent)` }} />}
+                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 transition-colors rounded-tl-lg" style={{ borderColor: isLight ? neo.dark : 'color-mix(in srgb, var(--accent-green) 40%, transparent)' }} />
+                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 transition-colors rounded-tr-lg" style={{ borderColor: isLight ? neo.dark : 'color-mix(in srgb, var(--accent-green) 40%, transparent)' }} />
+                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 transition-colors rounded-bl-lg" style={{ borderColor: isLight ? neo.dark : 'color-mix(in srgb, var(--accent-green) 40%, transparent)' }} />
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 transition-colors rounded-br-lg" style={{ borderColor: isLight ? neo.dark : 'color-mix(in srgb, var(--accent-green) 40%, transparent)' }} />
+                <span className="absolute -bottom-6 -right-3 text-8xl sm:text-9xl font-bold select-none pointer-events-none leading-none" style={{ fontFamily: "'Orbitron', sans-serif", color: isLight ? 'rgba(45, 58, 140, 0.06)' : 'color-mix(in srgb, var(--accent-green) 5%, transparent)' }}>{project.number}</span>
 
-                {/* Corner Minimal L-Brackets */}
-                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#D4AF37]/60 group-hover:border-[#D4AF37] transition-colors" />
-                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#D4AF37]/60 group-hover:border-[#D4AF37] transition-colors" />
-                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#D4AF37]/60 group-hover:border-[#D4AF37] transition-colors" />
-                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#D4AF37]/60 group-hover:border-[#D4AF37] transition-colors" />
-
-                {/* Big Background Watermark Number */}
-                <span
-                  className="absolute -bottom-6 -right-3 text-8xl sm:text-9xl font-bold text-[#EAD8C7]/5 select-none pointer-events-none leading-none"
-                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                >
-                  {project.number}
-                </span>
-
-                {/* Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
-                  
-                  {/* Left Column (7 Cols) */}
                   <div className="lg:col-span-7 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center space-x-3 mb-4">
-                        <span className="text-xs font-mono font-bold text-[#D4AF37]">
-                          {project.number} //
-                        </span>
-                        <span className="text-[10.5px] font-mono tracking-[0.25em] uppercase text-[#A8988B]">
-                          {project.category}
-                        </span>
+                        <span className="text-xs font-mono font-bold" style={{ color: 'var(--accent-green)' }}>{project.number} //</span>
+                        <span className="text-[10.5px] font-mono tracking-[0.25em] uppercase" style={{ color: 'var(--text-secondary)' }}>{project.category}</span>
                       </div>
-
-                      <h3
-                        className="text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-white mb-4 group-hover:text-[#F7E7C4] transition-colors uppercase leading-[0.9]"
-                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                      >
-                        {project.title}
-                      </h3>
-
-                      <p
-                        className="text-xs sm:text-sm md:text-[14px] font-light text-[#BDB0A4] leading-[1.85] tracking-wide mb-8 max-w-2xl"
-                        style={{ fontFamily: "'Montserrat', sans-serif" }}
-                      >
-                        {project.description}
-                      </p>
+                      <h3 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-4 uppercase leading-[0.9] transition-colors" style={{ color: 'var(--text-primary)' }}>{project.title}</h3>
+                      <p className="text-xs sm:text-sm md:text-[14px] font-light leading-[1.85] tracking-wide mb-8 max-w-2xl" style={{ color: 'var(--text-secondary)' }}>{project.description}</p>
                     </div>
-
-                    {/* Tech Stack Pills */}
-                    <div className="flex flex-wrap gap-2 pt-6 border-t border-[#8C6D4F]/25">
+                    <div className="flex flex-wrap gap-2 pt-6" style={{ borderTop: `1px solid ${isLight ? neo.dark : 'color-mix(in srgb, var(--accent-green) 15%, transparent)'}` }}>
                       {project.tech.map((t) => (
-                        <span
-                          key={t}
-                          className="px-3 py-1 text-[10px] font-medium tracking-[0.16em] uppercase rounded-sm border border-[#8C6D4F]/40 bg-[#16120E] text-[#E8D7C5] group-hover:border-[#D4AF37]/50 transition-all duration-300"
-                          style={{ fontFamily: "'Montserrat', sans-serif" }}
-                        >
-                          {t}
-                        </span>
+                        <span key={t} className={`px-3 py-1 text-[10px] font-mono font-medium tracking-[0.16em] uppercase transition-all duration-300 rounded-lg`}
+                          style={isLight
+                            ? { background: neo.bg, boxShadow: neo.inset, color: 'var(--text-secondary)' }
+                            : { border: '1px solid color-mix(in srgb, var(--accent-green) 30%, transparent)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-secondary)' }
+                          }>{t}</span>
                       ))}
                     </div>
                   </div>
 
-                  {/* Right Column (5 Cols) */}
-                  <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-6 lg:pl-6 lg:border-l lg:border-[#8C6D4F]/25">
+                  <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-6 lg:pl-6" style={{ borderLeft: `1px solid ${isLight ? neo.dark : 'color-mix(in srgb, var(--accent-green) 15%, transparent)'}` }}>
                     <div className="space-y-3">
-                      <span className="text-[9.5px] font-mono tracking-[0.25em] uppercase text-[#8C6D4F] block mb-2">
-                        // ARCHITECTURE METRICS
-                      </span>
+                      <span className="text-[9.5px] font-mono tracking-[0.25em] uppercase block mb-2" style={{ color: 'var(--accent-cyan)' }}>// SYSTEM METRICS</span>
                       {project.metrics.map((m) => (
-                        <div
-                          key={m.label}
-                          className="p-3.5 rounded-sm border border-[#8C6D4F]/25 bg-[#050403] flex items-center justify-between"
-                        >
-                          <span className="text-[10px] font-mono text-[#A8988B]">
-                            {m.label}
-                          </span>
-                          <span className="text-[11px] font-mono font-medium text-[#F7E7C4]">
-                            {m.value}
-                          </span>
+                        <div key={m.label} className={`p-3.5 flex items-center justify-between rounded-xl`}
+                          style={isLight
+                            ? { background: neo.bg, boxShadow: neo.inset }
+                            : { border: '1px solid color-mix(in srgb, var(--accent-green) 20%, transparent)', backgroundColor: 'var(--bg-primary)' }
+                          }>
+                          <span className="text-[10px] font-mono" style={{ color: 'var(--text-secondary)' }}>{m.label}</span>
+                          <span className="text-[11px] font-mono font-medium" style={{ color: 'var(--accent-green)' }}>{m.value}</span>
                         </div>
                       ))}
                     </div>
-
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center space-x-3 px-6 py-3.5 border border-[#8C6D4F] bg-[#16120E] hover:border-[#D4AF37] hover:bg-[#D4AF37] text-[#EAD8C7] hover:text-black text-[11px] font-medium tracking-[0.24em] uppercase transition-all duration-300 shadow-[0_0_20px_rgba(212,175,55,0.1)]"
-                      style={{ fontFamily: "'Montserrat', sans-serif" }}
-                    >
-                      <span>VIEW ON GITHUB</span>
-                      <span className="text-xs">↗</span>
+                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
+                      className={`inline-flex items-center justify-center space-x-3 px-6 py-3.5 text-[11px] font-mono font-medium tracking-[0.24em] uppercase transition-all duration-300 rounded-xl`}
+                      style={isLight
+                        ? { background: neo.bg, boxShadow: neo.raised, color: 'var(--accent-green)' }
+                        : { border: '1px solid color-mix(in srgb, var(--accent-green) 50%, transparent)', backgroundColor: 'var(--bg-primary)', color: 'var(--accent-green)' }
+                      }>
+                      <span>VIEW ON GITHUB</span><span className="text-xs">↗</span>
                     </a>
                   </div>
-
                 </div>
               </div>
             </ScrollStackItem>
           ))}
         </ScrollStack>
-
       </div>
     </section>
   );
 };
-
-export default ProjectsSection;

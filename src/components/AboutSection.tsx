@@ -2,14 +2,11 @@ import { useRef, useState } from 'react';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.18, delayChildren: 0.15 } },
-};
-const fadeUpVariants: Variants = {
-  hidden: { opacity: 0, y: 30, filter: 'blur(10px)' },
-  visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } },
 };
 
 export const AboutSection = () => {
@@ -17,6 +14,12 @@ export const AboutSection = () => {
   const [isCardHovered, setIsCardHovered] = useState(false);
   const { theme } = useTheme();
   const isLight = theme === 'light';
+  const isMobile = useMediaQuery('(max-width: 767px)');
+
+  // Animated blur filters are expensive on phone GPUs — fade/slide only there.
+  const fadeUpVariants: Variants = isMobile
+    ? { hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }
+    : { hidden: { opacity: 0, y: 30, filter: 'blur(10px)' }, visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } } };
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -53,7 +56,7 @@ export const AboutSection = () => {
   };
 
   return (
-    <section id="about" className="relative w-screen min-h-screen font-heading py-24 lg:py-32 px-6 sm:px-12 lg:px-20 overflow-hidden flex items-center" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+    <section id="about" className="relative w-full min-h-screen font-heading py-24 lg:py-32 px-6 sm:px-12 lg:px-20 overflow-hidden flex items-center" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       {/* Ambient Orbs */}
       <div className={`absolute top-1/4 left-1/6 w-[32rem] h-[32rem] rounded-full blur-[180px] pointer-events-none ${isLight ? 'orb-green' : ''}`} style={{ backgroundColor: isLight ? 'transparent' : 'var(--accent-green)', opacity: isLight ? 1 : 0.05 }} />
       <div className={`absolute bottom-1/6 right-1/4 w-[28rem] h-[28rem] rounded-full blur-[180px] pointer-events-none ${isLight ? 'orb-cyan' : ''}`} style={{ backgroundColor: isLight ? 'transparent' : 'var(--accent-cyan)', opacity: isLight ? 1 : 0.03 }} />

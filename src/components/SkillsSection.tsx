@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 const bentoCategories = [
   { title: 'FRONTEND ARCHITECTURE', badge: 'CORE PILLAR', items: ['Next.js', 'React.js', 'React Native', 'Tailwind CSS', 'HTML5', 'CSS3', 'Bootstrap'], description: 'Building high-performance client applications, responsive UIs, and interactive component systems with modern React ecosystem.', stat: '100% RESPONSIVE', colSpan: 'lg:col-span-7' },
@@ -11,15 +12,20 @@ const bentoCategories = [
 ];
 
 const containerVariants: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.14, delayChildren: 0.1 } } };
-const cardVariants: Variants = { hidden: { opacity: 0, y: 30, filter: 'blur(6px)' }, visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } } };
 
 export const SkillsSection = () => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const { theme } = useTheme();
   const isLight = theme === 'light';
+  const isMobile = useMediaQuery('(max-width: 767px)');
+
+  // Animated blur filters are expensive on phone GPUs — fade/slide only there.
+  const cardVariants: Variants = isMobile
+    ? { hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }
+    : { hidden: { opacity: 0, y: 30, filter: 'blur(6px)' }, visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } } };
 
   return (
-    <section id="skills" className="relative w-screen font-heading pt-8 pb-24 px-6 sm:px-12 lg:px-20 overflow-hidden flex flex-col justify-center" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+    <section id="skills" className="relative w-full font-heading pt-8 pb-24 px-6 sm:px-12 lg:px-20 overflow-hidden flex flex-col justify-center" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <div className={`absolute top-1/3 left-1/4 w-[34rem] h-[34rem] rounded-full blur-[180px] pointer-events-none ${isLight ? 'orb-green' : ''}`} style={{ backgroundColor: isLight ? 'transparent' : 'var(--accent-green)', opacity: isLight ? 1 : 0.04 }} />
       <div className={`absolute bottom-10 right-1/4 w-[28rem] h-[28rem] rounded-full blur-[180px] pointer-events-none ${isLight ? 'orb-cyan' : ''}`} style={{ backgroundColor: isLight ? 'transparent' : 'var(--accent-cyan)', opacity: isLight ? 1 : 0.04 }} />
 

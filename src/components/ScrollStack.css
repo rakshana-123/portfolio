@@ -27,3 +27,14 @@
   width: 100%;
   height: 1px;
 }
+
+/* Mobile / small screens: cards flow as a plain list — no pin runway, no
+   stacking offsets, just a gap between cards. */
+.scroll-stack-static .scroll-stack-inner {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.scroll-stack-static .scroll-stack-card + .scroll-stack-card {
+  margin-top: 1.75rem;
+}

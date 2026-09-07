@@ -1,5 +1,6 @@
-import React, { useLayoutEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react';
 import Lenis from 'lenis';
+import { motion } from 'framer-motion';
 import './ScrollStack.css';
 
 export interface ScrollStackItemProps {
@@ -11,7 +12,19 @@ export const ScrollStackItem: React.FC<ScrollStackItemProps> = ({
   children,
   itemClassName = '',
 }) => (
-  <div className={`scroll-stack-card ${itemClassName}`.trim()}>{children}</div>
+  <div className={`scroll-stack-card ${itemClassName}`.trim()}>
+    {/* Inner reveal lives on a child so it never fights the pin/scale
+        transform applied to the card itself. */}
+    <motion.div
+      className="scroll-stack-card-inner"
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -48px 0px' }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  </div>
 );
 
 export interface ScrollStackProps {
@@ -29,6 +42,10 @@ export interface ScrollStackProps {
   useWindowScroll?: boolean;
   onStackComplete?: () => void;
 }
+
+const canStackScroll = () =>
+  window.matchMedia('(min-width: 1024px)').matches &&
+  !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const ScrollStack: React.FC<ScrollStackProps> = ({
   children,
@@ -52,6 +69,24 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   const initialTopsRef = useRef<number[]>([]);
   const lastTransformsRef = useRef(new Map());
   const isUpdatingRef = useRef(false);
+
+  // Pin-stacking only makes sense when cards fit the viewport (desktop layout).
+  // On phones the single-column cards are taller than the screen, so pinning
+  // locks their lower half off-screen — fall back to a plain list there.
+  const [canStack, setCanStack] = useState(canStackScroll);
+
+  useEffect(() => {
+    const desktopMq = window.matchMedia('(min-width: 1024px)');
+    const reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setCanStack(desktopMq.matches && !reducedMq.matches);
+    update();
+    desktopMq.addEventListener('change', update);
+    reducedMq.addEventListener('change', update);
+    return () => {
+      desktopMq.removeEventListener('change', update);
+      reducedMq.removeEventListener('change', update);
+    };
+  }, []);
 
   const calculateProgress = useCallback((scrollTop: number, start: number, end: number) => {
     if (scrollTop < start) return 0;
@@ -217,6 +252,26 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   }, [handleScroll]);
 
   useLayoutEffect(() => {
+    if (!canStack) {
+      // Static list mode: strip any inline styles left over from a previous
+      // desktop run so cards flow naturally.
+      const cards = Array.from(
+        document.querySelectorAll('.scroll-stack-card')
+      ) as HTMLElement[];
+      cards.forEach((card) => {
+        card.style.transform = '';
+        card.style.filter = '';
+        card.style.zIndex = '';
+        card.style.marginBottom = '';
+        card.style.willChange = '';
+      });
+      lastTransformsRef.current.clear();
+      return;
+    }
+
+    let disposed = false;
+    let resizeRaf = 0;
+
     const cards = Array.from(
       document.querySelectorAll('.scroll-stack-card')
     ) as HTMLElement[];
@@ -241,10 +296,34 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       card.style.perspective = '1000px';
     });
 
+    // Re-measure when layout shifts (viewport resize, late webfont swap)
+    const remeasure = () => {
+      if (disposed) return;
+      cards.forEach((card) => {
+        card.style.transform = 'translateZ(0)';
+      });
+      initialTopsRef.current = cards.map((card) => {
+        const rect = card.getBoundingClientRect();
+        return rect.top + window.scrollY;
+      });
+      updateCardTransforms();
+    };
+
+    const handleResize = () => {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(remeasure);
+    };
+
+    window.addEventListener('resize', handleResize);
+    document.fonts?.ready?.then(remeasure);
+
     setupLenis();
     updateCardTransforms();
 
     return () => {
+      disposed = true;
+      cancelAnimationFrame(resizeRaf);
+      window.removeEventListener('resize', handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -258,6 +337,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       isUpdatingRef.current = false;
     };
   }, [
+    canStack,
     itemDistance,
     itemScale,
     itemStackDistance,
@@ -273,7 +353,10 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   ]);
 
   return (
-    <div className={`scroll-stack-scroller ${className}`.trim()} ref={scrollerRef}>
+    <div
+      className={`scroll-stack-scroller ${canStack ? '' : 'scroll-stack-static'} ${className}`.trim()}
+      ref={scrollerRef}
+    >
       <div className="scroll-stack-inner">
         {children}
         <div className="scroll-stack-end" />

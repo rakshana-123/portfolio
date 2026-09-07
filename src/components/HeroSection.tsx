@@ -3,15 +3,11 @@ import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { ThemeToggle } from './ThemeToggle';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.16, delayChildren: 0.2 } },
-};
-
-const fadeUpVariants: Variants = {
-  hidden: { opacity: 0, y: 18, filter: 'blur(6px)' },
-  visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } },
 };
 
 const typingTexts = [
@@ -79,15 +75,15 @@ const TypingAnimation = () => {
 
   return (
     <div className="flex flex-col space-y-3">
-      <div className="relative whitespace-nowrap">
-        <span className={`text-xl sm:text-2xl md:text-3xl font-mono tracking-wide ${getStyleClass()}`}
+      <div className="relative">
+        <span className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-mono tracking-wide leading-snug break-words sm:whitespace-nowrap ${getStyleClass()}`}
           style={{
             color: getGlowColor(),
             textShadow: `0 0 10px ${getGlowColor()}, 0 0 20px ${getGlowColor()}`,
           }}>
           {typingTexts[textIndex].text.slice(0, charIndex)}
         </span>
-        <span className="inline-block w-[3px] h-7 ml-1 animate-blink" style={{ backgroundColor: getGlowColor(), boxShadow: `0 0 8px ${getGlowColor()}` }} />
+        <span className="inline-block w-[3px] h-5 sm:h-7 ml-1 align-middle animate-blink" style={{ backgroundColor: getGlowColor(), boxShadow: `0 0 8px ${getGlowColor()}` }} />
       </div>
       <div className="flex space-x-1">
         {typingTexts.map((_, i) => (
@@ -107,6 +103,13 @@ export const HeroSection = () => {
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [isHovered, setIsHovered] = useState(false);
   const { theme } = useTheme();
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isFinePointer = useMediaQuery('(pointer: fine)');
+
+  // Animated blur filters are expensive on phone GPUs — fade/slide only there.
+  const fadeUpVariants: Variants = isMobile
+    ? { hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }
+    : { hidden: { opacity: 0, y: 18, filter: 'blur(6px)' }, visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } } };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY });
@@ -115,9 +118,10 @@ export const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative w-screen h-screen overflow-hidden font-heading cursor-none" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-      {/* Custom Cursor */}
-      {cursorPos.x >= 0 && (
+    <section className={`relative w-full min-h-dvh overflow-hidden font-heading ${isFinePointer ? 'cursor-none' : ''}`} style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      {/* Custom Cursor — mouse devices only; on touch screens taps fire
+          synthetic mousemove and would leave a stray glowing dot behind. */}
+      {isFinePointer && cursorPos.x >= 0 && (
         <motion.div
           className="fixed top-0 left-0 pointer-events-none z-50 rounded-full flex items-center justify-center"
           animate={{
@@ -215,8 +219,8 @@ export const HeroSection = () => {
 
           {/* Typing Animation */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="hidden lg:flex flex-col items-start pointer-events-auto pr-16 xl:pr-28 ml-8 z-20 select-none">
-            <div className={theme === 'light' ? 'glass p-6 space-y-4' : 'p-6 space-y-4'} style={theme === 'dark' ? { border: `1px solid color-mix(in srgb, var(--accent-green) 20%, transparent)`, backgroundColor: 'var(--bg-secondary)' } : {}}>
+            className="flex flex-col items-start pointer-events-auto z-20 select-none w-full lg:w-auto lg:pr-16 xl:pr-28 lg:ml-8">
+            <div className={`w-full lg:w-auto ${theme === 'light' ? 'glass p-5 sm:p-6 space-y-4' : 'p-5 sm:p-6 space-y-4'}`} style={theme === 'dark' ? { border: `1px solid color-mix(in srgb, var(--accent-green) 20%, transparent)`, backgroundColor: 'var(--bg-secondary)' } : {}}>
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 rounded-full animate-pulse-glow" style={{ backgroundColor: 'var(--accent-green)' }} />
                 <span className="text-[10px] font-mono tracking-[0.2em] uppercase" style={{ color: 'var(--accent-green)' }}>PORTFOLIO v2.0</span>

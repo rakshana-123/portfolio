@@ -277,6 +277,17 @@ html.light .orb-purple {
   100% { background-position: 0% 100%; }
 }
 
+/* Respect users who opt out of motion: kill looping decorations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 .animate-blink {
   animation: blink 0.7s step-end infinite;
 }
